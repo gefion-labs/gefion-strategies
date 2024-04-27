@@ -9,7 +9,7 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
-    address public management = 0xf95452937D4c48E0eA2E8489a0916367d385cE9A;
+    address public management = 0xbDf28015a8849E1246B7414700D71338E0565926;
 
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -22,7 +22,7 @@ contract Deploy is Script {
         );
 
         // Pick an unique salt
-        bytes32 salt = keccak256("v3.0.2");
+        bytes32 salt = keccak256("v1.0.0");
 
         address contractAddress = deployer.deployCreate2(salt, bytecode);
 
