@@ -8,7 +8,7 @@
 [submodule "lib/tokenized-strategy"]
 	path = lib/tokenized-strategy
 	url = https://github.com/gefion-labs/tokenized-strategy
-	release = v1.0.0
+	release = v1.0.1
 [submodule "lib/tokenized-strategy-periphery"]
 	path = lib/tokenized-strategy-periphery
 	url = https://github.com/gefion-labs/tokenized-strategy-periphery

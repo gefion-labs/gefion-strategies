@@ -9,6 +9,8 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
+    address public tokenizedStrategyAddress =
+        vm.envAddress("TOKENIZED_STRATEGY");
     address public management = vm.envAddress("MANAGEMENT");
 
     function run() external {
@@ -18,7 +20,12 @@ contract Deploy is Script {
         // Append constructor args to the bytecode
         bytes memory bytecode = abi.encodePacked(
             vm.getCode("StargateStakerFactory.sol:StargateStakerFactory"),
-            abi.encode(management, management, management)
+            abi.encode(
+                tokenizedStrategyAddress,
+                management,
+                management,
+                management
+            )
         );
 
         // Pick an unique salt

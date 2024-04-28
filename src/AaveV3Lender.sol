@@ -19,13 +19,9 @@ contract AaveV3Lender is BaseStrategy, UniswapV3Swapper, AuctionSwapper {
     using SafeERC20 for ERC20;
 
     // The pool to deposit and withdraw through.
-    IPool public constant lendingPool =
-        IPool(0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2);
-
-    IStakedAave internal constant stkAave =
-        IStakedAave(0x4da27a545c0c5B758a6BA100e3a049001de870f5);
-    address internal constant AAVE =
-        address(0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9);
+    IPool public immutable lendingPool;
+    IStakedAave internal immutable stkAave;
+    address internal immutable AAVE;
 
     // To get the Supply cap of an asset.
     uint256 internal constant SUPPLY_CAP_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFF000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFF; // prettier-ignore
@@ -51,9 +47,17 @@ contract AaveV3Lender is BaseStrategy, UniswapV3Swapper, AuctionSwapper {
     mapping(address => uint256) public minAmountToSellMapping;
 
     constructor(
+        address _tokenizedStrategyAddress,
         address _asset,
-        string memory _name
-    ) BaseStrategy(_asset, _name) {
+        string memory _name,
+        address _lendingPool,
+        address _stkAave,
+        address _AAVE
+    ) BaseStrategy(_tokenizedStrategyAddress, _asset, _name) {
+        lendingPool = IPool(_lendingPool);
+        stkAave = IStakedAave(_stkAave);
+        AAVE = _AAVE;
+
         // Set the aToken based on the asset we are using.
         aToken = IAToken(lendingPool.getReserveData(_asset).aTokenAddress);
 

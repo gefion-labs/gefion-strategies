@@ -10,6 +10,7 @@ contract AaveV3LenderFactory {
 
     event NewAaveV3Lender(address indexed strategy, address indexed asset);
 
+    address public immutable tokenizedStrategyAddress;
     address public management;
     address public performanceFeeRecipient;
     address public keeper;
@@ -18,10 +19,12 @@ contract AaveV3LenderFactory {
     mapping(address => address) public deployments;
 
     constructor(
+        address _tokenizedStrategyAddress,
         address _management,
         address _performanceFeeRecipient,
         address _keeper
     ) {
+        tokenizedStrategyAddress = _tokenizedStrategyAddress;
         management = _management;
         performanceFeeRecipient = _performanceFeeRecipient;
         keeper = _keeper;
@@ -36,14 +39,26 @@ contract AaveV3LenderFactory {
      */
     function newAaveV3Lender(
         address _asset,
-        string memory _name
+        string memory _name,
+        address _lendingPool,
+        address _stkAave,
+        address _AAVE
     ) external returns (address) {
         if (deployments[_asset] != address(0))
             revert AlreadyDeployed(deployments[_asset]);
         // We need to use the custom interface with the
         // tokenized strategies available setters.
         IStrategyInterface newStrategy = IStrategyInterface(
-            address(new AaveV3Lender(_asset, _name))
+            address(
+                new AaveV3Lender(
+                    tokenizedStrategyAddress,
+                    _asset,
+                    _name,
+                    _lendingPool,
+                    _stkAave,
+                    _AAVE
+                )
+            )
         );
 
         newStrategy.setPerformanceFeeRecipient(performanceFeeRecipient);
