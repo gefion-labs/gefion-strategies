@@ -9,9 +9,9 @@ import {BaseStrategy} from "@tokenized-strategy/BaseStrategy.sol";
 import {UniswapV2Swapper} from "@periphery/swappers/UniswapV2Swapper.sol";
 import {BaseHealthCheck} from "@periphery/Bases/HealthCheck/BaseHealthCheck.sol";
 
-import {ILPStaking} from "./interfaces/ILPStaking.sol";
-import {IStargateRouter} from "./interfaces/IStargateRouter.sol";
-import {IPool} from "./interfaces/IPool.sol";
+import {ILPStaking} from "./interfaces/Stargate/ILPStaking.sol";
+import {IStargateRouter} from "./interfaces/Stargate/IStargateRouter.sol";
+import {IPool} from "./interfaces/Stargate/IPool.sol";
 
 /**
  * @title StargateStaker
