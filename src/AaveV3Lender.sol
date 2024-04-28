@@ -473,4 +473,12 @@ contract AaveV3Lender is BaseStrategy, UniswapV3Swapper, AuctionSwapper {
     function _emergencyWithdraw(uint256 _amount) internal override {
         _freeFunds(_amount);
     }
+
+    function setRouter(address _router) external onlyManagement {
+        router = _router;
+    }
+
+    function setBase(address _base) external onlyManagement {
+        base = _base;
+    }
 }
