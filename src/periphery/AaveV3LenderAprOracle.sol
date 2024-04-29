@@ -13,11 +13,9 @@ contract AaveV3LenderAprOracle is AprOracleBase {
     IProtocolDataProvider public immutable protocolDataProvider;
 
     constructor(
-        string memory _name,
-        address _governance,
         address _lendingPool,
         address _protocolDataProvider
-    ) AprOracleBase(_name, _governance) {
+    ) AprOracleBase("Aave V3 Lender Oracle", msg.sender) {
         lendingPool = IPool(_lendingPool);
         protocolDataProvider = IProtocolDataProvider(_protocolDataProvider);
     }

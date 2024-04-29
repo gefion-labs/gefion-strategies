@@ -9,9 +9,9 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
-    address public lendingPool = vm.envAddress("AAVE_V3_LENDING_POOL");
-    address public protocolDataProvider =
-        vm.envAddress("AAVE_V3_PROTOCOL_DATA_PROVIDER");
+    address public base = vm.envAddress("WETH");
+    address public router = vm.envAddress("UNISWAP_V2_ROUTER");
+    uint256 public blockPerYear = vm.envUint("BLOCK_PER_YEAR");
 
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -19,8 +19,8 @@ contract Deploy is Script {
 
         // Append constructor args to the bytecode
         bytes memory bytecode = abi.encodePacked(
-            vm.getCode("AaveV3LenderAprOracle.sol:AaveV3LenderAprOracle"),
-            abi.encode(lendingPool, protocolDataProvider)
+            vm.getCode("StargateStakerAprOracle.sol:StargateStakerAprOracle"),
+            abi.encode(base, router, blockPerYear)
         );
 
         // Pick an unique salt

@@ -36,4 +36,10 @@ interface ILPStaking {
         uint256 _pid,
         address _user
     ) external view returns (uint256);
+
+    function totalAllocPoint() external view returns (uint256);
+
+    function stargatePerBlock() external view returns (uint256);
+
+    function lpBalances(uint256) external view returns (uint256);
 }
