@@ -8,18 +8,18 @@ import {StargateStaker} from "./StargateStaker.sol";
 contract StargateStakerFactory {
     event NewStargateStaker(address indexed strategy, address indexed asset);
 
-    address public immutable tokenizedStrategyAddress;
+    address public immutable tokenizedStrategy;
     address public management;
     address public perfomanceFeeRecipient;
     address public keeper;
 
     constructor(
-        address _tokenizedStrategyAddress,
+        address _tokenizedStrategy,
         address _management,
         address _peformanceFeeRecipient,
         address _keeper
     ) {
-        tokenizedStrategyAddress = _tokenizedStrategyAddress;
+        tokenizedStrategy = _tokenizedStrategy;
         management = _management;
         perfomanceFeeRecipient = _peformanceFeeRecipient;
         keeper = _keeper;
@@ -35,7 +35,7 @@ contract StargateStakerFactory {
         IStrategy newStrategy = IStrategy(
             address(
                 new StargateStaker(
-                    tokenizedStrategyAddress,
+                    tokenizedStrategy,
                     _asset,
                     _name,
                     _lpStaker,

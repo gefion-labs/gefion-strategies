@@ -9,9 +9,10 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
-    address public tokenizedStrategy =
-        vm.envAddress("TOKENIZED_STRATEGY");
-    address public management = vm.envAddress("MANAGEMENT");
+    address public governance = vm.envAddress("MANAGEMENT");
+    address public lendingPool = vm.envAddress("AAVE_V3_LENDING_POOL");
+    address public protocolDataProvider =
+        vm.envAddress("AAVE_V3_PROTOCOL_DATA_PROVIDER");
 
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -19,12 +20,12 @@ contract Deploy is Script {
 
         // Append constructor args to the bytecode
         bytes memory bytecode = abi.encodePacked(
-            vm.getCode("AaveV3LenderFactory.sol:AaveV3LenderFactory"),
+            vm.getCode("AaveV3LenderAprOracle.sol:AaveV3LenderAprOracle"),
             abi.encode(
-                tokenizedStrategy,
-                management,
-                management,
-                management
+                "Aave V3 Lender Apr Oracle",
+                governance,
+                lendingPool,
+                protocolDataProvider
             )
         );
 

@@ -9,7 +9,7 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
-    address public tokenizedStrategyAddress =
+    address public tokenizedStrategy =
         vm.envAddress("TOKENIZED_STRATEGY");
     address public management = vm.envAddress("MANAGEMENT");
 
@@ -21,7 +21,7 @@ contract Deploy is Script {
         bytes memory bytecode = abi.encodePacked(
             vm.getCode("StargateStakerFactory.sol:StargateStakerFactory"),
             abi.encode(
-                tokenizedStrategyAddress,
+                tokenizedStrategy,
                 management,
                 management,
                 management

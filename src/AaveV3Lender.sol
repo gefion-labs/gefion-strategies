@@ -47,13 +47,17 @@ contract AaveV3Lender is BaseStrategy, UniswapV3Swapper, AuctionSwapper {
     mapping(address => uint256) public minAmountToSellMapping;
 
     constructor(
-        address _tokenizedStrategyAddress,
+        address _tokenizedStrategy,
+        address _auctionFactory,
         address _asset,
         string memory _name,
         address _lendingPool,
         address _stkAave,
         address _AAVE
-    ) BaseStrategy(_tokenizedStrategyAddress, _asset, _name) {
+    )
+        BaseStrategy(_tokenizedStrategy, _asset, _name)
+        AuctionSwapper(_auctionFactory)
+    {
         lendingPool = IPool(_lendingPool);
         stkAave = IStakedAave(_stkAave);
         AAVE = _AAVE;

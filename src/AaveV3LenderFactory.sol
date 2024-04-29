@@ -10,7 +10,8 @@ contract AaveV3LenderFactory {
 
     event NewAaveV3Lender(address indexed strategy, address indexed asset);
 
-    address public immutable tokenizedStrategyAddress;
+    address public immutable tokenizedStrategy;
+    address public immutable auctionFactory;
     address public management;
     address public performanceFeeRecipient;
     address public keeper;
@@ -19,12 +20,14 @@ contract AaveV3LenderFactory {
     mapping(address => address) public deployments;
 
     constructor(
-        address _tokenizedStrategyAddress,
+        address _tokenizedStrategy,
+        address _auctionFactory,
         address _management,
         address _performanceFeeRecipient,
         address _keeper
     ) {
-        tokenizedStrategyAddress = _tokenizedStrategyAddress;
+        tokenizedStrategy = _tokenizedStrategy;
+        auctionFactory = _auctionFactory;
         management = _management;
         performanceFeeRecipient = _performanceFeeRecipient;
         keeper = _keeper;
@@ -51,7 +54,8 @@ contract AaveV3LenderFactory {
         IStrategyInterface newStrategy = IStrategyInterface(
             address(
                 new AaveV3Lender(
-                    tokenizedStrategyAddress,
+                    tokenizedStrategy,
+                    auctionFactory,
                     _asset,
                     _name,
                     _lendingPool,

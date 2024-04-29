@@ -38,13 +38,13 @@ contract StargateStaker is BaseHealthCheck, UniswapV2Swapper {
     event MaxToSellUpdated(uint256 newMaxAmountToSell);
 
     constructor(
-        address _tokenizedStrategyAddress,
+        address _tokenizedStrategy,
         address _asset,
         string memory _name,
         address _lpStaker,
         address _stargateRouter,
         uint16 _stakingID
-    ) BaseHealthCheck(_tokenizedStrategyAddress, _asset, _name) {
+    ) BaseHealthCheck(_tokenizedStrategy, _asset, _name) {
         lpStaker = ILPStaking(_lpStaker);
         stargateRouter = IStargateRouter(_stargateRouter);
         stakingID = _stakingID;
