@@ -20,7 +20,7 @@ contract Deploy is Script {
 
         // Append constructor args to the bytecode
         bytes memory bytecode = abi.encodePacked(
-            vm.getCode("AaveV3LenderFactory.sol:AaveV3LenderFactory"),
+            vm.getCode("UniswapV3SwapperFactory.sol:UniswapV3SwapperFactory"),
             abi.encode(
                 tokenizedStrategy,
                 management,

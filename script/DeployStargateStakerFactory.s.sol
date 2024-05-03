@@ -9,13 +9,14 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
-    address public tokenizedStrategy =
-        vm.envAddress("TOKENIZED_STRATEGY");
-    address public management = vm.envAddress("MANAGEMENT");
+    address public tokenizedStrategy = vm.envAddress("TOKENIZED_STRATEGY");
+    address public base = vm.envAddress("BASE_TOKEN");
+    address public router = vm.envAddress("UNISWAP_V2_ROUTER");
 
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
+        address management = vm.addr(deployerPrivateKey);
 
         // Append constructor args to the bytecode
         bytes memory bytecode = abi.encodePacked(
@@ -24,7 +25,9 @@ contract Deploy is Script {
                 tokenizedStrategy,
                 management,
                 management,
-                management
+                management,
+                base,
+                router
             )
         );
 

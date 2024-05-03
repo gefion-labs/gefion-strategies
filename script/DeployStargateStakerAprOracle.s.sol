@@ -9,7 +9,7 @@ contract Deploy is Script {
     Deployer public deployer =
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
-    address public base = vm.envAddress("WETH");
+    address public base = vm.envAddress("BASE_TOKEN");
     address public router = vm.envAddress("UNISWAP_V2_ROUTER");
     uint256 public blockPerYear = vm.envUint("BLOCK_PER_YEAR");
 

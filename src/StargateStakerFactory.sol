@@ -12,17 +12,23 @@ contract StargateStakerFactory {
     address public management;
     address public perfomanceFeeRecipient;
     address public keeper;
+    address public base;
+    address public router;
 
     constructor(
         address _tokenizedStrategy,
         address _management,
         address _peformanceFeeRecipient,
-        address _keeper
+        address _keeper,
+        address _base,
+        address _router
     ) {
         tokenizedStrategy = _tokenizedStrategy;
         management = _management;
         perfomanceFeeRecipient = _peformanceFeeRecipient;
         keeper = _keeper;
+        base = _base;
+        router = _router;
     }
 
     function newStargateStaker(
@@ -32,18 +38,18 @@ contract StargateStakerFactory {
         address _stargateRouter,
         uint16 _stakingID
     ) external returns (address) {
-        IStrategy newStrategy = IStrategy(
-            address(
-                new StargateStaker(
-                    tokenizedStrategy,
-                    _asset,
-                    _name,
-                    _lpStaker,
-                    _stargateRouter,
-                    _stakingID
-                )
-            )
+        StargateStaker stargateStaker = new StargateStaker(
+            tokenizedStrategy,
+            _asset,
+            _name,
+            _lpStaker,
+            _stargateRouter,
+            _stakingID
         );
+        stargateStaker.setBase(base);
+        stargateStaker.setRouter(router);
+
+        IStrategy newStrategy = IStrategy(address(stargateStaker));
 
         newStrategy.setPerformanceFeeRecipient(perfomanceFeeRecipient);
         newStrategy.setKeeper(keeper);
@@ -56,11 +62,15 @@ contract StargateStakerFactory {
     function setAddresses(
         address _management,
         address _perfomanceFeeRecipient,
-        address _keeper
+        address _keeper,
+        address _base,
+        address _router
     ) external {
         require(msg.sender == management, "!management");
         management = _management;
         perfomanceFeeRecipient = _perfomanceFeeRecipient;
         keeper = _keeper;
+        base = _base;
+        router = _router;
     }
 }

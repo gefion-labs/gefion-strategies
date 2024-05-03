@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.18;
 
-import {AaveV3Lender} from "./AaveV3Lender.sol";
+import {UniswapV3Swapper} from "./UniswapV3Swapper.sol";
 import {IStrategyInterface} from "./interfaces/Aave/V3/IStrategyInterface.sol";
 
-contract AaveV3LenderFactory {
+contract UniswapV3SwapperFactory {
     /// @notice Revert message for when a strategy has already been deployed.
     error AlreadyDeployed(address _strategy);
 
-    event NewAaveV3Lender(address indexed strategy, address indexed asset);
+    event NewUniswapV3Swapper(address indexed strategy, address indexed asset);
 
     address public immutable tokenizedStrategy;
-    address public immutable auctionFactory;
     address public management;
     address public performanceFeeRecipient;
     address public keeper;
@@ -23,7 +22,6 @@ contract AaveV3LenderFactory {
 
     constructor(
         address _tokenizedStrategy,
-        address _auctionFactory,
         address _management,
         address _performanceFeeRecipient,
         address _keeper,
@@ -31,7 +29,6 @@ contract AaveV3LenderFactory {
         address _router
     ) {
         tokenizedStrategy = _tokenizedStrategy;
-        auctionFactory = _auctionFactory;
         management = _management;
         performanceFeeRecipient = _performanceFeeRecipient;
         keeper = _keeper;
@@ -40,45 +37,40 @@ contract AaveV3LenderFactory {
     }
 
     /**
-     * @notice Deploy a new Aave V3 Lender.
+     * @notice Deploy a new Uniswap V3.
      * @dev This will set the msg.sender to all of the permissioned roles.
      * @param _asset The underlying asset for the lender to use.
      * @param _name The name for the lender to use.
      * @return . The address of the new lender.
      */
-    function newAaveV3Lender(
+    function newUniswapV3Swapper(
         address _asset,
         string memory _name,
-        address _lendingPool,
-        address _stkAave,
-        address _AAVE
+        address _reward
     ) external returns (address) {
         if (deployments[_asset] != address(0))
             revert AlreadyDeployed(deployments[_asset]);
 
         // We need to use the custom interface with the
         // tokenized strategies available setters.
-        AaveV3Lender aaveV3Lender = new AaveV3Lender(
+        UniswapV3Swapper uniswapV3Swapper = new UniswapV3Swapper(
             tokenizedStrategy,
-            auctionFactory,
             _asset,
             _name,
-            _lendingPool,
-            _stkAave,
-            _AAVE
+            _reward
         );
-        aaveV3Lender.setBase(base);
-        aaveV3Lender.setRouter(router);
+        uniswapV3Swapper.setBase(base);
+        uniswapV3Swapper.setRouter(router);
 
         IStrategyInterface newStrategy = IStrategyInterface(
-            address(aaveV3Lender)
+            address(uniswapV3Swapper)
         );
 
         newStrategy.setPerformanceFeeRecipient(performanceFeeRecipient);
         newStrategy.setKeeper(keeper);
         newStrategy.setPendingManagement(management);
 
-        emit NewAaveV3Lender(address(newStrategy), _asset);
+        emit NewUniswapV3Swapper(address(newStrategy), _asset);
 
         deployments[_asset] = address(newStrategy);
         return address(newStrategy);
