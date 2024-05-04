@@ -46,7 +46,8 @@ contract UniswapV3SwapperFactory {
     function newUniswapV3Swapper(
         address _asset,
         string memory _name,
-        address _reward
+        address _reward,
+        uint24 _fee
     ) external returns (address) {
         if (deployments[_asset] != address(0))
             revert AlreadyDeployed(deployments[_asset]);
@@ -61,6 +62,7 @@ contract UniswapV3SwapperFactory {
         );
         uniswapV3Swapper.setBase(base);
         uniswapV3Swapper.setRouter(router);
+        uniswapV3Swapper.setUniFees(_asset, _reward, _fee);
 
         IStrategyInterface newStrategy = IStrategyInterface(
             address(uniswapV3Swapper)
