@@ -5,9 +5,6 @@ import {UniswapV3Swapper} from "./UniswapV3Swapper.sol";
 import {IStrategyInterface} from "./interfaces/Aave/V3/IStrategyInterface.sol";
 
 contract UniswapV3SwapperFactory {
-    /// @notice Revert message for when a strategy has already been deployed.
-    error AlreadyDeployed(address _strategy);
-
     event NewUniswapV3Swapper(address indexed strategy, address indexed asset);
 
     address public immutable tokenizedStrategy;
@@ -16,9 +13,6 @@ contract UniswapV3SwapperFactory {
     address public keeper;
     address public base;
     address public router;
-
-    /// @notice Track the deployments. asset => pool => strategy
-    mapping(address => address) public deployments;
 
     constructor(
         address _tokenizedStrategy,
@@ -49,9 +43,6 @@ contract UniswapV3SwapperFactory {
         address _reward,
         uint24 _fee
     ) external returns (address) {
-        if (deployments[_asset] != address(0))
-            revert AlreadyDeployed(deployments[_asset]);
-
         // We need to use the custom interface with the
         // tokenized strategies available setters.
         UniswapV3Swapper uniswapV3Swapper = new UniswapV3Swapper(
@@ -74,7 +65,6 @@ contract UniswapV3SwapperFactory {
 
         emit NewUniswapV3Swapper(address(newStrategy), _asset);
 
-        deployments[_asset] = address(newStrategy);
         return address(newStrategy);
     }
 
@@ -91,12 +81,5 @@ contract UniswapV3SwapperFactory {
         keeper = _keeper;
         base = _base;
         router = _router;
-    }
-
-    function isDeployedStrategy(
-        address _strategy
-    ) external view returns (bool) {
-        address _asset = IStrategyInterface(_strategy).asset();
-        return deployments[_asset] == _strategy;
     }
 }
