@@ -3,6 +3,7 @@ pragma solidity 0.8.18;
 
 import {UniswapV3Swapper} from "./UniswapV3Swapper.sol";
 import {IStrategyInterface} from "./interfaces/Aave/V3/IStrategyInterface.sol";
+import {IVault} from "@vaults/interfaces/IVault.sol";
 
 contract UniswapV3SwapperFactory {
     event NewUniswapV3Swapper(address indexed strategy, address indexed asset);
@@ -41,7 +42,9 @@ contract UniswapV3SwapperFactory {
         address _asset,
         string memory _name,
         address _reward,
-        uint24 _fee
+        uint24 _fee,
+        address _vault,
+        uint256 _initialDebt
     ) external returns (address) {
         // We need to use the custom interface with the
         // tokenized strategies available setters.
@@ -63,9 +66,51 @@ contract UniswapV3SwapperFactory {
         newStrategy.setKeeper(keeper);
         newStrategy.setPendingManagement(management);
 
+        if (_vault != address(0)) {
+            // auto add strategy to vault
+            IVault(_vault).addStrategy(address(newStrategy));
+
+            // update initial debt
+            if (_initialDebt > 0) {
+                IVault(_vault).updateMaxDebtForStrategy(
+                    address(newStrategy),
+                    _initialDebt
+                );
+                IVault(_vault).updateDebt(address(newStrategy), _initialDebt);
+            }
+        }
+
         emit NewUniswapV3Swapper(address(newStrategy), _asset);
 
         return address(newStrategy);
+    }
+
+    function newUniswapV3Swapper(
+        address _asset,
+        string memory _name,
+        address _reward,
+        uint24 _fee,
+        address _vault
+    ) external returns (address) {
+        return
+            this.newUniswapV3Swapper(_asset, _name, _reward, _fee, _vault, 0);
+    }
+
+    function newUniswapV3Swapper(
+        address _asset,
+        string memory _name,
+        address _reward,
+        uint24 _fee
+    ) external returns (address) {
+        return
+            this.newUniswapV3Swapper(
+                _asset,
+                _name,
+                _reward,
+                _fee,
+                address(0),
+                0
+            );
     }
 
     function setAddresses(

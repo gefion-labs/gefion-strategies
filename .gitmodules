@@ -12,3 +12,6 @@
 [submodule "lib/tokenized-strategy-periphery"]
 	path = lib/tokenized-strategy-periphery
 	url = https://github.com/gefion-labs/tokenized-strategy-periphery
+[submodule "lib/gefion-vaults"]
+	path = lib/gefion-vaults
+	url = https://github.com/gefion-labs/gefion-vaults
