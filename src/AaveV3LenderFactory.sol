@@ -3,11 +3,9 @@ pragma solidity 0.8.18;
 
 import {AaveV3Lender} from "./AaveV3Lender.sol";
 import {IStrategyInterface} from "./interfaces/Aave/V3/IStrategyInterface.sol";
+import {IVault} from "@vaults/interfaces/IVault.sol";
 
 contract AaveV3LenderFactory {
-    /// @notice Revert message for when a strategy has already been deployed.
-    error AlreadyDeployed(address _strategy);
-
     event NewAaveV3Lender(address indexed strategy, address indexed asset);
 
     address public immutable tokenizedStrategy;
@@ -17,9 +15,6 @@ contract AaveV3LenderFactory {
     address public keeper;
     address public base;
     address public router;
-
-    /// @notice Track the deployments. asset => pool => strategy
-    mapping(address => address) public deployments;
 
     constructor(
         address _tokenizedStrategy,
@@ -51,11 +46,10 @@ contract AaveV3LenderFactory {
         string memory _name,
         address _lendingPool,
         address _stkAave,
-        address _AAVE
+        address _AAVE,
+        address _vault,
+        uint256 _initialDebt
     ) external returns (address) {
-        if (deployments[_asset] != address(0))
-            revert AlreadyDeployed(deployments[_asset]);
-
         // We need to use the custom interface with the
         // tokenized strategies available setters.
         AaveV3Lender aaveV3Lender = new AaveV3Lender(
@@ -78,10 +72,62 @@ contract AaveV3LenderFactory {
         newStrategy.setKeeper(keeper);
         newStrategy.setPendingManagement(management);
 
+        if (_vault != address(0)) {
+            // auto add strategy to vault
+            IVault(_vault).addStrategy(address(newStrategy));
+
+            // update initial debt
+            if (_initialDebt > 0) {
+                IVault(_vault).updateMaxDebtForStrategy(
+                    address(newStrategy),
+                    _initialDebt
+                );
+                IVault(_vault).updateDebt(address(newStrategy), _initialDebt);
+            }
+        }
+
         emit NewAaveV3Lender(address(newStrategy), _asset);
 
-        deployments[_asset] = address(newStrategy);
         return address(newStrategy);
+    }
+
+    function newAaveV3Lender(
+        address _asset,
+        string memory _name,
+        address _lendingPool,
+        address _stkAave,
+        address _AAVE,
+        address _vault
+    ) external returns (address) {
+        return
+            this.newAaveV3Lender(
+                _asset,
+                _name,
+                _lendingPool,
+                _stkAave,
+                _AAVE,
+                _vault,
+                0
+            );
+    }
+
+    function newAaveV3Lender(
+        address _asset,
+        string memory _name,
+        address _lendingPool,
+        address _stkAave,
+        address _AAVE
+    ) external returns (address) {
+        return
+            this.newAaveV3Lender(
+                _asset,
+                _name,
+                _lendingPool,
+                _stkAave,
+                _AAVE,
+                address(0),
+                0
+            );
     }
 
     function setAddresses(
@@ -97,12 +143,5 @@ contract AaveV3LenderFactory {
         keeper = _keeper;
         base = _base;
         router = _router;
-    }
-
-    function isDeployedStrategy(
-        address _strategy
-    ) external view returns (bool) {
-        address _asset = IStrategyInterface(_strategy).asset();
-        return deployments[_asset] == _strategy;
     }
 }

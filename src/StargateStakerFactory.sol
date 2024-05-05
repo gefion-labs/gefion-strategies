@@ -2,6 +2,7 @@
 pragma solidity 0.8.18;
 
 import {IStrategy} from "@tokenized-strategy/interfaces/IStrategy.sol";
+import {IVault} from "@vaults/interfaces/IVault.sol";
 
 import {StargateStaker} from "./StargateStaker.sol";
 
@@ -36,7 +37,9 @@ contract StargateStakerFactory {
         string memory _name,
         address _lpStaker,
         address _stargateRouter,
-        uint16 _stakingID
+        uint16 _stakingID,
+        address _vault,
+        uint256 _initialDebt
     ) external returns (address) {
         StargateStaker stargateStaker = new StargateStaker(
             tokenizedStrategy,
@@ -55,8 +58,61 @@ contract StargateStakerFactory {
         newStrategy.setKeeper(keeper);
         newStrategy.setPendingManagement(management);
 
+        if (_vault != address(0)) {
+            // auto add strategy to vault
+            IVault(_vault).addStrategy(address(newStrategy));
+
+            // update initial debt
+            if (_initialDebt > 0) {
+                IVault(_vault).updateMaxDebtForStrategy(
+                    address(newStrategy),
+                    _initialDebt
+                );
+                IVault(_vault).updateDebt(address(newStrategy), _initialDebt);
+            }
+        }
+
         emit NewStargateStaker(address(newStrategy), _asset);
         return address(newStrategy);
+    }
+
+    function newStargateStaker(
+        address _asset,
+        string memory _name,
+        address _lpStaker,
+        address _stargateRouter,
+        uint16 _stakingID,
+        address _vault
+    ) external returns (address) {
+        return
+            this.newStargateStaker(
+                _asset,
+                _name,
+                _lpStaker,
+                _stargateRouter,
+                _stakingID,
+                _vault,
+                0
+            );
+    }
+
+    function newStargateStaker(
+        address _asset,
+        string memory _name,
+        address _lpStaker,
+        address _stargateRouter,
+        uint16 _stakingID
+    ) external returns (address) {
+        return
+            this.newStargateStaker(
+                _asset,
+                _name,
+                _lpStaker,
+                _stargateRouter,
+                _stakingID,
+                address(0),
+                0
+            );
     }
 
     function setAddresses(
