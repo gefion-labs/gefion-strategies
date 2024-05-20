@@ -7,9 +7,9 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 // Swappers
-import {UniswapV3Swapper as BaseUniswapV3Swapper} from "@periphery/swappers/UniswapV3Swapper.sol";
+import {UniswapV2Swapper as BaseUniswapV2Swapper} from "@periphery/swappers/UniswapV2Swapper.sol";
 
-contract UniswapV3Swapper is BaseStrategy, BaseUniswapV3Swapper {
+contract UniswapV2Swapper is BaseStrategy, BaseUniswapV2Swapper {
     using SafeERC20 for ERC20;
 
     uint256 public maxAmountToSell = 250 * 1e18;
@@ -29,26 +29,6 @@ contract UniswapV3Swapper is BaseStrategy, BaseUniswapV3Swapper {
 
         // Make sure its a real token.
         require(address(reward) != address(0), "!reward");
-    }
-
-    /**
-     * @notice Set the uni fees for swaps.
-     * @dev External function available to management to set
-     * the fees used in the `UniswapV3Swapper.
-     *
-     * Any incentivized tokens will need a fee to be set for each
-     * reward token that it wishes to swap on reports.
-     *
-     * @param _token0 The first token of the pair.
-     * @param _token1 The second token of the pair.
-     * @param _fee The fee to be used for the pair.
-     */
-    function setUniFees(
-        address _token0,
-        address _token1,
-        uint24 _fee
-    ) external onlyManagement {
-        _setUniFees(_token0, _token1, _fee);
     }
 
     /*//////////////////////////////////////////////////////////////

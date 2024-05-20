@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.18;
 
-import {UniswapV3Swapper} from "./UniswapV3Swapper.sol";
-import {IStrategyInterface} from "./interfaces/Uniswap/V3/IStrategyInterface.sol";
+import {UniswapV2Swapper} from "./UniswapV2Swapper.sol";
+import {IStrategyInterface} from "./interfaces/Uniswap/V2/IStrategyInterface.sol";
 import {IVault} from "@vaults/interfaces/IVault.sol";
 
-contract UniswapV3SwapperFactory {
-    event NewUniswapV3Swapper(address indexed strategy, address indexed asset);
+contract UniswapV2SwapperFactory {
+    event NewUniswapV2Swapper(address indexed strategy, address indexed asset);
 
     address public immutable tokenizedStrategy;
     address public management;
@@ -32,34 +32,32 @@ contract UniswapV3SwapperFactory {
     }
 
     /**
-     * @notice Deploy a new Uniswap V3.
+     * @notice Deploy a new Uniswap V2.
      * @dev This will set the msg.sender to all of the permissioned roles.
      * @param _asset The underlying asset for the lender to use.
      * @param _name The name for the lender to use.
      * @return . The address of the new lender.
      */
-    function newUniswapV3Swapper(
+    function newUniswapV2Swapper(
         address _asset,
         string memory _name,
         address _reward,
-        uint24 _fee,
         address _vault,
         uint256 _initialDebt
     ) external returns (address) {
         // We need to use the custom interface with the
         // tokenized strategies available setters.
-        UniswapV3Swapper uniswapV3Swapper = new UniswapV3Swapper(
+        UniswapV2Swapper uniswapV2Swapper = new UniswapV2Swapper(
             tokenizedStrategy,
             _asset,
             _name,
             _reward
         );
-        uniswapV3Swapper.setBase(base);
-        uniswapV3Swapper.setRouter(router);
-        uniswapV3Swapper.setUniFees(_asset, _reward, _fee);
+        uniswapV2Swapper.setBase(base);
+        uniswapV2Swapper.setRouter(router);
 
         IStrategyInterface newStrategy = IStrategyInterface(
-            address(uniswapV3Swapper)
+            address(uniswapV2Swapper)
         );
 
         newStrategy.setPerformanceFeeRecipient(performanceFeeRecipient);
@@ -80,37 +78,26 @@ contract UniswapV3SwapperFactory {
             }
         }
 
-        emit NewUniswapV3Swapper(address(newStrategy), _asset);
+        emit NewUniswapV2Swapper(address(newStrategy), _asset);
 
         return address(newStrategy);
     }
 
-    function newUniswapV3Swapper(
+    function newUniswapV2Swapper(
         address _asset,
         string memory _name,
         address _reward,
-        uint24 _fee,
         address _vault
     ) external returns (address) {
-        return
-            this.newUniswapV3Swapper(_asset, _name, _reward, _fee, _vault, 0);
+        return this.newUniswapV2Swapper(_asset, _name, _reward, _vault, 0);
     }
 
-    function newUniswapV3Swapper(
+    function newUniswapV2Swapper(
         address _asset,
         string memory _name,
-        address _reward,
-        uint24 _fee
+        address _reward
     ) external returns (address) {
-        return
-            this.newUniswapV3Swapper(
-                _asset,
-                _name,
-                _reward,
-                _fee,
-                address(0),
-                0
-            );
+        return this.newUniswapV2Swapper(_asset, _name, _reward, address(0), 0);
     }
 
     function setAddresses(
