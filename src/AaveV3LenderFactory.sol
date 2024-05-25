@@ -80,7 +80,7 @@ contract AaveV3LenderFactory {
             if (_initialDebt > 0) {
                 IVault(_vault).updateMaxDebtForStrategy(
                     address(newStrategy),
-                    _initialDebt
+                    type(uint256).max
                 );
                 IVault(_vault).updateDebt(address(newStrategy), _initialDebt);
             }

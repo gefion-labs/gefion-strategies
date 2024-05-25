@@ -10,6 +10,7 @@ contract Deploy is Script {
         Deployer(0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed);
 
     address public tokenizedStrategy = vm.envAddress("TOKENIZED_STRATEGY");
+    address public auctionFactory = vm.envAddress("AUCTION_FACTORY");
     address public base = vm.envAddress("BASE_TOKEN");
     address public router = vm.envAddress("UNISWAP_V3_ROUTER");
 
@@ -23,6 +24,7 @@ contract Deploy is Script {
             vm.getCode("AaveV3LenderFactory.sol:AaveV3LenderFactory"),
             abi.encode(
                 tokenizedStrategy,
+                auctionFactory,
                 management,
                 management,
                 management,
